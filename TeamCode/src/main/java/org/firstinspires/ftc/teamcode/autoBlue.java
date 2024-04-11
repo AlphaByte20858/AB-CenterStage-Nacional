@@ -32,8 +32,8 @@ import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import java.util.ArrayList;
 import java.util.List;
 
-@Autonomous (name = "NotRedProp", group = "LinearOpMode")
-public class AutonomousRedRight extends LinearOpMode {
+@Autonomous (name = "redProp", group = "LinearOpMode")
+public class autoBlue extends LinearOpMode {
 
     double cX = 0;
     double cY = 0;
@@ -101,31 +101,27 @@ public class AutonomousRedRight extends LinearOpMode {
         FtcDashboard dashboard = FtcDashboard.getInstance();
         telemetry = new MultipleTelemetry(telemetry, dashboard.getTelemetry());
         FtcDashboard.getInstance().startCameraStream(controlHubCam, 30);
-        boolean Lmin = cX > 265 && cY > 585;
-        boolean Lmax = cX < 275 && cY < 595;
-        boolean Mmin = cX > 265 && cY > 585;
-        boolean Mmax = cX < 275 && cY < 595;
+        boolean Lmax = cX > 600;
+        boolean Mmax = cX < 600;
 
 
-        if (Lmin && Lmax){
+        if (Lmax){
             ObjectPos = mark.Left;
         }
-        else if (Mmin && Mmax){
+        else if (Mmax){
             ObjectPos = mark.Middle;
         }
         else{
             ObjectPos = mark.Right;
         }
+
+        telemetry.addData("obj",ObjectPos);
         ElapsedTime tempo = new ElapsedTime();
         waitForStart();
-
-
-        controlHubCam.stopStreaming();
-
         TrajectorySequence MpontuarMark = drive.trajectorySequenceBuilder(new Pose2d(0,0, Math.toRadians(0)))
                 //.lineToLinearHeading(new Pose2d(-40,40, Math.toRadians(-95)))
                 .lineToLinearHeading(new Pose2d(-22,0,Math.toRadians(0)))
-                .turn(Math.toRadians(180))
+                .turn(Math.toRadians(-90))
                 .build();
 
         TrajectorySequence LpontuarMark = drive.trajectorySequenceBuilder(new Pose2d(0,0, Math.toRadians(0)))
@@ -138,46 +134,38 @@ public class AutonomousRedRight extends LinearOpMode {
                 .turn(Math.toRadians(-90))
                 .build();
 
-        TrajectorySequence MmirarBackstage = drive.trajectorySequenceBuilder(new Pose2d(0,0, Math.toRadians(0)))
-                .turn(Math.toRadians(90))
-                .build();
-        TrajectorySequence LmirarBackstage = drive.trajectorySequenceBuilder(new Pose2d(0,0, Math.toRadians(0)))
-                .turn(Math.toRadians(180))
-                .build();
-        TrajectorySequence DmirarBackstage = drive.trajectorySequenceBuilder(new Pose2d(0,0, Math.toRadians(0)))
-                .turn(Math.toRadians(180))
-                .build();
-
-
 
 
         Trajectory pontuar= drive.trajectoryBuilder(MpontuarMark.end())
-                .back(17)
+                .back(25)
                 .build();
 
 
-            //if (!isStopRequested())
 
-           // drive.followTrajectorySequence(MpontuarMark);
-            tempo.reset();
-            while (tempo.seconds() < 1.6){
-                MBD.setPower(0.7);
-            }
-            MBD.setPower(0);
-            drive.followTrajectory(pontuar);
-            tempo.reset();
-            while (tempo.seconds() < 0.4){
-                MART.setPower(-0.2);
-             }
-            SGE.setPosition(0.5);
-            SGD.setPosition(0.5);
-            while(tempo.seconds() < 30)
-            {}}
+        if (!isStopRequested())
+            drive.followTrajectorySequence(MpontuarMark);
+        tempo.reset();
+        while (tempo.seconds() < 1.5){
+            MBD.setPower(0.7);
+        }
+        MBD.setPower(0);
+        drive.followTrajectory(pontuar);
+        tempo.reset();
+        while (tempo.seconds() < 0.4){
+            MART.setPower(-0.2);
+        }
+        SGE.setPosition(0.5);
+        SGD.setPosition(0.5);
+        while(tempo.seconds() < 30)
+        {}
+        controlHubCam.stopStreaming();
+
+        }
 
 
 
 
-        // Release resource
+    // Release resource
 
     private void initOpenCV() {
 
@@ -188,7 +176,7 @@ public class AutonomousRedRight extends LinearOpMode {
         // Use OpenCvCameraFactory class from FTC SDK to create camera instance
         controlHubCam = OpenCvCameraFactory.getInstance().createWebcam(
                 hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
-        controlHubCam.setPipeline(new AutonomousRedRight.ConeVermelho());
+        controlHubCam.setPipeline(new autoBlue.ConeVermelho());
 
         controlHubCam.openCameraDevice();
         controlHubCam.startStreaming(CAMERA_WIDTH, CAMERA_HEIGHT, OpenCvCameraRotation.UPRIGHT);
