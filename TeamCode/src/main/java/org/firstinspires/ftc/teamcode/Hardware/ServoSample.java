@@ -17,12 +17,12 @@ public class ServoSample extends OpMode {
     }
     public void loop(){
         if(gamepad2.x) {
-            SGD.setPosition(0.7);
+            //SGD.setPosition(0.7);
             SGE.setPosition(0.7);
         }
         if (gamepad2.y) {
-            SGD.setPosition(0.5);
-            SGE.setPosition(0.5);
+            //SGD.setPosition(0.2);
+            SGE.setPosition(0.2);
         }
     }
 }

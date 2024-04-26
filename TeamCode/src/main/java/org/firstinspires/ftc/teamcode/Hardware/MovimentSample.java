@@ -20,10 +20,10 @@ public class MovimentSample extends OpMode {
 
     @Override
     public void init() {
-        MEF = hardwareMap.get(DcMotorEx.class, "LeftDriveUp");
-        MDF = hardwareMap.get(DcMotorEx.class, "RightDriveUp");
-        MET = hardwareMap.get(DcMotorEx.class, "LeftDriveDown");
-        MDT = hardwareMap.get(DcMotorEx.class, "RightDriveDown");
+        MEF = hardwareMap.get(DcMotorEx.class, "MEF");
+        MDF = hardwareMap.get(DcMotorEx.class, "MDF");
+        MET = hardwareMap.get(DcMotorEx.class, "MET");
+        MDT = hardwareMap.get(DcMotorEx.class, "MDT");
 
         MDF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         MDT.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);

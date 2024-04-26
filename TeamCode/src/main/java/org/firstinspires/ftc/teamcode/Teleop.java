@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -18,6 +19,7 @@ import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 
 @TeleOp(name = "TeleOp", group = "OpMode")
 public class Teleop extends OpMode {
+    AnalogInput BE;
     DcMotorEx MEF, MDF, MET, MDT, MBD, MART;
     Servo SGD, SGE, SD;
     IMU imu;
@@ -39,6 +41,7 @@ public class Teleop extends OpMode {
         SGD = hardwareMap.get(Servo.class,"SGD" );
         SGE = hardwareMap.get(Servo.class,"SGE" );
         SD = hardwareMap.get(Servo.class,"SD" );
+        BE = hardwareMap.get(AnalogInput.class, "BE");
 
         MDF.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         MDT.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
@@ -99,8 +102,8 @@ public class Teleop extends OpMode {
     }
     public void movi() {
         double axial   = gamepad1.right_trigger - gamepad1.left_trigger;
-        double lateral = gamepad1.left_stick_x               ;
-        double yaw     =  gamepad1.right_stick_x * 0.65;
+        double lateral = gamepad1.left_stick_x * 0.9               ;
+        double yaw     =  gamepad1.right_stick_x * 0.6;
 
         double absaxial = Math.abs(axial);
         double abslateral = Math.abs(lateral);
@@ -108,7 +111,6 @@ public class Teleop extends OpMode {
         double denominador = Math.max(absaxial + abslateral + absyaw, 1);
         YawPitchRollAngles XYZangles = imu.getRobotYawPitchRollAngles();
         AngularVelocity XYZvelocity = imu.getRobotAngularVelocity(AngleUnit.DEGREES);
-
         double motorEsquerdoFf = (axial + lateral + yaw / denominador);
         double motorDireitoFf = (axial - lateral - yaw / denominador);
         double motorEsquerdoTf = (axial - lateral + yaw / denominador);
@@ -118,7 +120,7 @@ public class Teleop extends OpMode {
             MotorsPower(motorEsquerdoFf, motorDireitoFf , motorEsquerdoTf, motorDireitoTf);
         }
         else {
-            MotorsPower(motorEsquerdoFf * 0.7, motorDireitoFf * 0.7, motorEsquerdoTf * 0.7, motorDireitoTf * 0.7);
+            MotorsPower(motorEsquerdoFf * 0.85, motorDireitoFf * 0.85, motorEsquerdoTf * 0.85, motorDireitoTf * 0.85);
         }
         telemetry.addData("MDF", MDF.getCurrentPosition());
         telemetry.addData("MEF", MEF.getCurrentPosition());
@@ -149,13 +151,19 @@ public class Teleop extends OpMode {
             }
             GE.reset();
         }
+        if (gamepad2.dpad_right){
+            SGD.setPosition(0.5);
+        }
+        if (gamepad2.dpad_left){
+            SGE.setPosition(0.5);
+        }
     }
     int Powerteste = 0;
     int lastposArm = 0;
-    //Motores do braço
+    //Motores do braçoe
+    ElapsedTime tempoArm = new ElapsedTime();
     public void arm(){
         MBD.setPower(gamepad2.right_trigger - gamepad2.left_trigger);
-
     } //1.4
 
     //Avião
@@ -168,20 +176,15 @@ public class Teleop extends OpMode {
     //Articulaçao da garra
     public void art() {
         if (gamepad2.right_bumper) {
-            MART.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            MART.setPower(0.4);
-            lastPosArt = MART.getCurrentPosition();
+            MART.setPower(0.2);
         }
         else if (gamepad2.left_bumper){
-            MART.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            MART.setPower(-0.4);
-            lastPosArt = MART.getCurrentPosition();
+            MART.setPower(-0.2);
         }
         else {
-            MART.setTargetPosition(lastPosArt);
-            MART.setPower(0.4);
-            MART.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            MART.setPower(0);
         }
+        telemetry.addData("BE",BE.getVoltage());
         telemetry.addData("art", MART.getCurrentPosition());
     }
 }
