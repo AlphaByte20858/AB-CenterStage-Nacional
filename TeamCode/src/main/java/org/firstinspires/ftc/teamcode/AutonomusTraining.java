@@ -63,13 +63,15 @@ public class AutonomusTraining extends LinearOpMode {
                     .build();
 
             TrajectorySequence midBD = drive.trajectorySequenceBuilder(new Pose2d(0,0, Math.toRadians(0)))
-                    .turn(Math.toRadians(-90))
-                    .lineTo(new Vector2d(-29,0))
+                    //.turn(Math.toRadians(-90))
+                    .lineToLinearHeading(new Pose2d(-24, 36, Math.toRadians(-90)))
                     .build();
 
-            TrajectorySequence Stacionar = drive.trajectorySequenceBuilder(new Pose2d(0,0, Math.toRadians(0)))
-                    .lineTo(new Vector2d(-4,-36))
+            TrajectorySequence ED = drive.trajectorySequenceBuilder(new Pose2d(0,0, Math.toRadians(0)))
+                    .strafeRight(25)
                     .build();
+
+
             ElapsedTime tempo = new ElapsedTime();
             SGE.setPosition(0.5);
             SGD.setPosition(0.5);
@@ -84,7 +86,7 @@ public class AutonomusTraining extends LinearOpMode {
             sleep(2000);
             tempo.reset();
             while (tempo.seconds() < 3){
-                MART.setPower(0.45);
+                MART.setPower(0.2);
             }
             MART.setPower(0);
             sleep(500);
@@ -95,6 +97,10 @@ public class AutonomusTraining extends LinearOpMode {
             sleep(500);
             tempo.reset();
             while (tempo.seconds() < 2){
+                MART.setPower(-0.2);
+            }
+            tempo.reset();
+            while (tempo.seconds() < 2){
                 MBD.setPower(0.40);
             }
             MBD.setPower(0);
@@ -102,13 +108,12 @@ public class AutonomusTraining extends LinearOpMode {
             drive.followTrajectorySequence(midBD);
             tempo.reset();
             while (tempo.seconds() < 2){
-                MART.setPower(0.25);
+                MART.setPower(0.2);
             }
-            MART.setPower(0);
-            tempo.reset();
-            while (tempo.seconds() < 1){
+            while (3 > tempo.seconds() && tempo.seconds() > 1.8){
                 SGE.setPosition(0);
             }
+            MART.setPower(0);
 
             requestOpModeStop();
         }
