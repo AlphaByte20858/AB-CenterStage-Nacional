@@ -234,8 +234,8 @@ public class TWOPIXELS extends LinearOpMode {
             Mat YCbCR = new Mat();
             Imgproc.cvtColor(frame, YCbCR, Imgproc.COLOR_RGB2HSV);
 
-            Scalar lowerYellow = new Scalar(121, 54, 54); // the lower hsv threshold for red
-            Scalar upperYellow = new Scalar(190, 28, 28); // the upper hsv threshold for red 255, 0, 0
+            Scalar lowerYellow = new Scalar(121, 54, 54); // the lower hsv threshold for blue
+            Scalar upperYellow = new Scalar(190, 28, 28); // the upper hsv threshold for blue, red is 255, 0, 0
 
             Mat yellowMask = new Mat();
             Core.inRange(YCbCR, lowerYellow, upperYellow, yellowMask);
