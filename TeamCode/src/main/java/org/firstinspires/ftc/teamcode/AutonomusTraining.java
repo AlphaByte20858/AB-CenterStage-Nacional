@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.teamcode.CameraOpmodes.PropAzul;
 import org.firstinspires.ftc.teamcode.autonomous.AutoBlueLow;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
@@ -29,6 +30,7 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
+import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -44,6 +46,7 @@ public class AutonomusTraining extends LinearOpMode {
     double cX = 0;
     double cY = 0;
     double width = 0;
+    boolean meio, direita, esquerda;
 
     private OpenCvCamera controlHubCam;  // Use OpenCvCamera class from FTC SDK
     private static final int CAMERA_WIDTH = 1280; // width  of wanted camera resolution
@@ -52,13 +55,6 @@ public class AutonomusTraining extends LinearOpMode {
     // Calculate the distance using the formula
     public static final double objectWidthInRealWorldUnits = 3.75;  // Replace with the actual width of the object in real-world units
     public static final double focalLength = 728;  // Replace with the focal length of the camera in pixels
-
-    public enum mark{
-        Left,
-        Middle,
-        Right
-    }
-    mark ObjectPos;
 
     public void runOpMode() {
 
@@ -104,14 +100,9 @@ public class AutonomusTraining extends LinearOpMode {
 
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
             TrajectorySequence mid = drive.trajectorySequenceBuilder(new Pose2d(0, 0, Math.toRadians(0)))
-                    .lineToLinearHeading(new Pose2d(-24, 4, Math.toRadians(0)))
-                    .strafeTo(new Vector2d(-24, -4))
+                    .lineToLinearHeading(new Pose2d(-20, 2, Math.toRadians(0)))
+                    .strafeTo(new Vector2d(-20, -4))
                     .turn(Math.toRadians(180))
-                    .build();
-
-            TrajectorySequence midBD = drive.trajectorySequenceBuilder(new Pose2d(0,0, Math.toRadians(0)))
-                    .turn(Math.toRadians(-90))
-                    .lineToLinearHeading(new Pose2d(-24, 36, Math.toRadians(-90)))
                     .build();
 
             TrajectorySequence right = drive.trajectorySequenceBuilder(new Pose2d(0,0, Math.toRadians(0)))
@@ -127,31 +118,43 @@ public class AutonomusTraining extends LinearOpMode {
                     .turn(Math.toRadians(-15))
                     .build();
 
+            TrajectorySequence RightP = drive.trajectorySequenceBuilder(new Pose2d(0,0, Math.toRadians(0)))
+                    .turn(Math.toRadians(-90))
+                    .lineToLinearHeading(new Pose2d(-3, 2, Math.toRadians(0)))
+                    .build();
+
             ElapsedTime tempo = new ElapsedTime();
             SGE.setPosition(0);
             SGD.setPosition(0);
+        initOpenCV();
         telemetry = new MultipleTelemetry(telemetry, dashboard.getTelemetry());
         FtcDashboard.getInstance().startCameraStream(controlHubCam, 30);
-
         waitForStart();
-            if (!isStopRequested())
 
-                if (ObjectPos == mark.Left){
-                    drive.followTrajectorySequence(left);
+        if (!isStopRequested())
+                //RIGHT
+                if (cX > 570 && cY > 600){
+                    drive.followTrajectorySequence(right);
                     tempo.startTime();
                     tempo.reset();
-                    while (tempo.seconds()<1){
+                    while (tempo.seconds() < 1){
                         MART.setPower(0.1);
                     }
                     MART.setPower(0);
+                    sleep(1000);
                     SGE.setPosition(1);
                     tempo.reset();
-                    while (tempo.seconds() < 1) {
+                    while (tempo.seconds() < 1){
                         MART.setPower(-0.3);
                     }
+                    MART.setPower(0);
+                    direita = true;
                 }
 
-                else if (ObjectPos == mark.Middle){
+                //MIDDLE
+                //127, 590
+                else if (cX < 500 && cX > 100){
+                    tempo.reset();
                     drive.followTrajectorySequence(mid);
                     sleep(2000);
                     tempo.reset();
@@ -171,91 +174,144 @@ public class AutonomusTraining extends LinearOpMode {
                         MBD.setPower(0.40);
                     }
                     MBD.setPower(0);
-                    sleep(500);
-                    drive.followTrajectorySequence(midBD);
+                    meio = true;
+                }
+
+                //LEFT
+                else{
+                    drive.followTrajectorySequence(left);
+                    tempo.startTime();
                     tempo.reset();
-                    while (tempo.seconds() < 1){
+                    while (tempo.seconds()<1){
                         MART.setPower(0.1);
+                    }
+                    MART.setPower(0);
+                    SGE.setPosition(1);
+                    tempo.reset();
+                    while (tempo.seconds() < 1) {
+                        MART.setPower(-0.3);
+                    }
+                    esquerda = true;
+                }
+
+                if (direita){
+                    tempo.reset();
+                    while (tempo.seconds()<2){
+                        MBD.setPower(0.4);
+                    }
+                    MBD.setPower(0);
+                    drive.followTrajectorySequence(RightP);
+                    tempo.reset();
+                    while (tempo.seconds() <2){
+                        MART.setPower(0.2);
                     }
                     SGD.setPosition(1);
                     MART.setPower(0);
-                }
-                //RIGHT
-
-                else{
-                    drive.followTrajectorySequence(right);
-                    tempo.startTime();
-                    tempo.reset();
-                    while (tempo.seconds() < 1){
-                        MART.setPower(0.1);
-                    }
-                    MART.setPower(0);
-                    sleep(1000);
-                    SGE.setPosition(1);
-                    tempo.reset();
-                    while (tempo.seconds() < 1){
-                        MART.setPower(-0.3);
-                    }
-                    MART.setPower(0);
-
                 }
 
             requestOpModeStop();
 
         }
-    class Pipeline extends OpenCvPipeline{
-        Mat YCbCr = new Mat();
-        Mat leftCrop;
-        Mat rightCrop;
-        Mat midCrop;
-        double leftavgfin;
-        double rightavgfin;
-        double midavgfin;
-        Mat output = new Mat();
-        Scalar rectColor = new Scalar(0.0, 0.0, 255);
-        public Mat processFrame(Mat input){
-            Imgproc.cvtColor(input, YCbCr, Imgproc.COLOR_RGB2YCrCb);
-            telemetry.addLine("Pipeline rodando");
 
-            Rect leftRect = new Rect(140, 400, 300, 300);
-            Rect midRect = new Rect(700, 400, 300, 300);
+    private void initOpenCV() {
 
-            input.copyTo(output);
-            Imgproc.rectangle(output, leftRect, rectColor, 2);
-            Imgproc.rectangle(output, midRect, rectColor, 2);
+        // Create an instance of the camera
+        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
+                "cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
 
-            leftCrop = YCbCr.submat(leftRect);
-            midCrop = YCbCr.submat(midRect);
+        // Use OpenCvCameraFactory class from FTC SDK to create camera instance
+        controlHubCam = OpenCvCameraFactory.getInstance().createWebcam(
+                hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
+        controlHubCam.setPipeline(new AutonomusTraining.ConeAzul());
 
-            Core.extractChannel(leftCrop, leftCrop, 1);
-            Core.extractChannel(midCrop, midCrop, 1);
+        controlHubCam.openCameraDevice();
+        controlHubCam.startStreaming(CAMERA_WIDTH, CAMERA_HEIGHT, OpenCvCameraRotation.UPRIGHT);
+    }
 
-            Scalar leftavg = Core.mean(leftCrop);
-            Scalar midavg = Core.mean(midCrop);
+    class ConeAzul extends OpenCvPipeline {
+        @Override
+        public Mat processFrame(Mat input) {
+            // Preprocess the frame to detect yellow regions
+            Mat yellowMask = preprocessFrame(input);
 
-            leftavgfin = leftavg.val[0];
-            midavgfin = midavg.val[0];
+            // Find contours of the detected yellow regions
+            List<MatOfPoint> contours = new ArrayList<>();
+            Mat hierarchy = new Mat();
+            Imgproc.findContours(yellowMask, contours, hierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
 
+            // Find the largest yellow contour (blob)
+            MatOfPoint largestContour = findLargestContour(contours);
 
-            telemetry.addData("Direita", midavgfin);
-            telemetry.addData("Meio", leftavgfin);
-            telemetry.update();
+            if (largestContour != null) {
+                // Draw a red outline around the largest detected object
+                Imgproc.drawContours(input, contours, contours.indexOf(largestContour), new Scalar(255, 0, 0), 2);
+                // Calculate the width of the bounding box
+                width = calculateWidth(largestContour);
 
-            if (leftavgfin > (midavgfin + 4) || midavgfin > (leftavgfin + 4)){
-                if (leftavgfin < midavgfin){
-                    ObjectPos = AutonomusTraining.mark.Middle;
+                // Display the width next to the label
+                String widthLabel = "Width: " + (int) width + " pixels";
+                Imgproc.putText(input, widthLabel, new Point(cX + 10, cY + 20), Imgproc.FONT_HERSHEY_SIMPLEX, 0.5, new Scalar(0, 255, 0), 2);
+                //Display the Distance
+                String distanceLabel = "Distance: " + String.format("%.2f", getDistance(width)) + " inches";
+                Imgproc.putText(input, distanceLabel, new Point(cX + 10, cY + 60), Imgproc.FONT_HERSHEY_SIMPLEX, 0.5, new Scalar(0, 255, 0), 2);
+                // Calculate the centroid of the largest contour
+                Moments moments = Imgproc.moments(largestContour);
+                cX = moments.get_m10() / moments.get_m00();
+                cY = moments.get_m01() / moments.get_m00();
 
-                }
-                else if (leftavgfin > midavgfin) {
+                // Draw a dot at the centroid
+                String label = "(" + (int) cX + ", " + (int) cY + ")";
+                Imgproc.putText(input, label, new Point(cX + 10, cY), Imgproc.FONT_HERSHEY_COMPLEX, 0.5, new Scalar(0, 255, 0), 2);
+                Imgproc.circle(input, new Point(cX, cY), 5, new Scalar(0, 255, 0), -1);
 
-                    ObjectPos = AutonomusTraining.mark.Right;
-                }}
-            else{
-                ObjectPos = AutonomusTraining.mark.Left;
             }
 
-            return (output);
+            return input;
         }
+
+        private Mat preprocessFrame(Mat frame) {
+            Mat YCbCR = new Mat();
+            Imgproc.cvtColor(frame, YCbCR, Imgproc.COLOR_RGB2HSV);
+
+            Scalar lowerYellow = new Scalar(63, 70, 56); // the lower hsv threshold for Blue
+            Scalar upperYellow = new Scalar(232, 255, 255); // the upper hsv threshold for Blue
+
+
+            Mat yellowMask = new Mat();
+            Core.inRange(YCbCR, lowerYellow, upperYellow, yellowMask);
+
+            Mat kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(5, 5));
+            Imgproc.morphologyEx(yellowMask, yellowMask, Imgproc.MORPH_OPEN, kernel);
+            Imgproc.morphologyEx(yellowMask, yellowMask, Imgproc.MORPH_CLOSE, kernel);
+
+            return yellowMask;
+        }
+
+        private MatOfPoint findLargestContour(List<MatOfPoint> contours) {
+            double maxArea = 0;
+            MatOfPoint largestContour = null;
+
+            for (MatOfPoint contour : contours) {
+                double area = Imgproc.contourArea(contour);
+                if (area > maxArea) {
+                    maxArea = area;
+                    largestContour = contour;
+                }
+            }
+
+            return largestContour;
+        }
+
+        private double calculateWidth(MatOfPoint contour) {
+            Rect boundingRect = Imgproc.boundingRect(contour);
+            return boundingRect.width;
+        }
+
+    }
+
+    private static double getDistance(double width) {
+        double distance = (objectWidthInRealWorldUnits * focalLength) / width;
+        return distance;
     }
 }
                 /*braco.reset();
