@@ -110,6 +110,7 @@ public class AutonomusTraining extends LinearOpMode {
                     .strafeRight(26)
                     .turn(Math.toRadians(-100))
                     .build();
+            //pos end -27, -22
 
             TrajectorySequence left = drive.trajectorySequenceBuilder(new Pose2d(0,0, Math.toRadians(0)))
                     .lineToLinearHeading(new Pose2d(-24,6, Math.toRadians(0)))
@@ -120,7 +121,7 @@ public class AutonomusTraining extends LinearOpMode {
 
             TrajectorySequence RightP = drive.trajectorySequenceBuilder(new Pose2d(0,0, Math.toRadians(0)))
                     .turn(Math.toRadians(-90))
-                    .lineToLinearHeading(new Pose2d(-3, 2, Math.toRadians(0)))
+                    .lineToLinearHeading(new Pose2d(-30, -35, Math.toRadians(-90)))
                     .build();
 
             ElapsedTime tempo = new ElapsedTime();
@@ -130,8 +131,6 @@ public class AutonomusTraining extends LinearOpMode {
         telemetry = new MultipleTelemetry(telemetry, dashboard.getTelemetry());
         FtcDashboard.getInstance().startCameraStream(controlHubCam, 30);
         waitForStart();
-
-        if (!isStopRequested())
                 //RIGHT
                 if (cX > 570 && cY > 600){
                     drive.followTrajectorySequence(right);
@@ -200,8 +199,8 @@ public class AutonomusTraining extends LinearOpMode {
                         MBD.setPower(0.4);
                     }
                     MBD.setPower(0);
+                    sleep(2000);
                     drive.followTrajectorySequence(RightP);
-                    tempo.reset();
                     while (tempo.seconds() <2){
                         MART.setPower(0.2);
                     }
