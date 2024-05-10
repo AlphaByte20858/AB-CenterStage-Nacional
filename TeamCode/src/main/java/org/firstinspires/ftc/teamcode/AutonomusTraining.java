@@ -30,6 +30,7 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
+import com.acmerobotics.roadrunner.path.Path;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -46,7 +47,9 @@ public class AutonomusTraining extends LinearOpMode {
     double cX = 0;
     double cY = 0;
     double width = 0;
-    boolean meio, direita, esquerda;
+    boolean MPB, DPB, EPB;
+    // P = perto (2° slot) , B = posicao central no BD;
+    // **AINDA SER FEITO** L = longe do BD, P(3° slot) pontuar
 
     private OpenCvCamera controlHubCam;  // Use OpenCvCamera class from FTC SDK
     private static final int CAMERA_WIDTH = 1280; // width  of wanted camera resolution
@@ -107,7 +110,8 @@ public class AutonomusTraining extends LinearOpMode {
 
             TrajectorySequence right = drive.trajectorySequenceBuilder(new Pose2d(0,0, Math.toRadians(0)))
                     .lineToLinearHeading(new Pose2d(-27,4, Math.toRadians(0)))
-                    .strafeRight(26)
+                    .strafeTo(new Vector2d(-27, -22))
+                    //.strafeRight(26) (se o de cima n funcionar, colocar esse, se o RightP piorar, volta esse tb
                     .turn(Math.toRadians(-100))
                     .build();
             //pos end -27, -22
@@ -121,7 +125,8 @@ public class AutonomusTraining extends LinearOpMode {
 
             TrajectorySequence RightP = drive.trajectorySequenceBuilder(new Pose2d(0,0, Math.toRadians(0)))
                     .turn(Math.toRadians(-90))
-                    .lineToLinearHeading(new Pose2d(-30, -35, Math.toRadians(-90)))
+                    .lineToConstantHeading(new Vector2d(-30, 35))
+                    //.lineToLinearHeading(new Pose2d(-30, -35, Math.toRadians(-90))) se piorar a movi, voltar esse antes do de cima
                     .build();
 
             ElapsedTime tempo = new ElapsedTime();
@@ -147,7 +152,7 @@ public class AutonomusTraining extends LinearOpMode {
                         MART.setPower(-0.3);
                     }
                     MART.setPower(0);
-                    direita = true;
+                    DPB = true;
                 }
 
                 //MIDDLE
@@ -173,7 +178,7 @@ public class AutonomusTraining extends LinearOpMode {
                         MBD.setPower(0.40);
                     }
                     MBD.setPower(0);
-                    meio = true;
+                    MPB = true;
                 }
 
                 //LEFT
@@ -190,10 +195,10 @@ public class AutonomusTraining extends LinearOpMode {
                     while (tempo.seconds() < 1) {
                         MART.setPower(-0.3);
                     }
-                    esquerda = true;
+                    EPB = true;
                 }
 
-                if (direita){
+                if (DPB){
                     tempo.reset();
                     while (tempo.seconds()<2){
                         MBD.setPower(0.4);
