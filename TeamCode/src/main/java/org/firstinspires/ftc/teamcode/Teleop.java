@@ -163,8 +163,7 @@ public class Teleop extends OpMode {
     //Motores do braçoe
     ElapsedTime tempoArm = new ElapsedTime();
     public void arm(){
-        MBD.setPower(gamepad2.right_trigger - gamepad2.left_trigger);
-    } //1.4
+        MBD.setPower(gamepad2.right_trigger - gamepad2.left_trigger);telemetry.addData("ValorBraço", MBD.getPower());} //1.4
 
     //Avião
     public void drone(){
