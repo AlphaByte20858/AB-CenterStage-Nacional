@@ -119,8 +119,7 @@ public class AutonomusTraining extends LinearOpMode {
 
             TrajectorySequence RightP = drive.trajectorySequenceBuilder(right.end())
                     .turn(Math.toRadians(10))
-                    .lineToLinearHeading(new Pose2d(-26, -26, Math.toRadians(-90)))
-                    .lineToLinearHeading(new Pose2d(-32 ,-20, Math.toRadians(-90)))
+                    .lineToLinearHeading(new Pose2d(-36 ,-10, Math.toRadians(-90))) //X-32 Y -26
                     .build();
 
             TrajectorySequence MidP = drive.trajectorySequenceBuilder(mid.end())
@@ -133,7 +132,7 @@ public class AutonomusTraining extends LinearOpMode {
                     .build();
 
             TrajectorySequence ER = drive.trajectorySequenceBuilder(RightP.end())
-                    .strafeTo(new Vector2d(0,-22))
+                    .strafeTo(new Vector2d(-44,-10))
                     .build();
 
             TrajectorySequence EL = drive.trajectorySequenceBuilder(LeftP.end())
@@ -171,7 +170,7 @@ public class AutonomusTraining extends LinearOpMode {
                     MART.setPower(0);
                     tempo.reset();
                     while (tempo.seconds()<2){
-                        MBD.setPower(0.37);
+                        MBD.setPower(0.35);
                     }
                     MBD.setPower(0);
                     drive.followTrajectorySequence(RightP);
