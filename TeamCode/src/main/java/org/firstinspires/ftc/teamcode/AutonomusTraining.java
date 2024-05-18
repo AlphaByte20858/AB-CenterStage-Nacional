@@ -92,15 +92,14 @@ public class AutonomusTraining extends LinearOpMode {
 
             MBD.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-
         FtcDashboard dashboard = FtcDashboard.getInstance();
         telemetry = new MultipleTelemetry(telemetry, dashboard.getTelemetry());
         FtcDashboard.getInstance().startCameraStream(controlHubCam, 30);
 
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
             TrajectorySequence mid = drive.trajectorySequenceBuilder(new Pose2d(0, 0, Math.toRadians(0)))
-                    .lineToLinearHeading(new Pose2d(-20, 2, Math.toRadians(0)))
-                    .strafeTo(new Vector2d(-20, -4))
+                    //.lineToLinearHeading(new Pose2d(-20, 2, Math.toRadians(0))) re adicionar se a de baixo n for
+                    .lineToLinearHeading(new Pose2d(-20, -4, Math.toRadians(0))) //e aq colocar splineTo(de preferencia splineToLinearHeading)
                     .turn(Math.toRadians(180))
                     .build();
 
@@ -117,30 +116,31 @@ public class AutonomusTraining extends LinearOpMode {
                     .turn(Math.toRadians(-15))
                     .build();
 
-            TrajectorySequence RightP = drive.trajectorySequenceBuilder(right.end())
+            TrajectorySequence RightP = drive.trajectorySequenceBuilder(right.end().plus(new Pose2d(0,0, Math.toRadians(-100))))
                     .turn(Math.toRadians(10))
-                    .lineToLinearHeading(new Pose2d(-36 ,-10, Math.toRadians(-90))) //X-32 Y -26
+                    .lineToLinearHeading(new Pose2d(-7 ,-11, Math.toRadians(-90))) //X-32 Y -26
                     .build();
 
-            TrajectorySequence MidP = drive.trajectorySequenceBuilder(mid.end())
-                    .turn(Math.toRadians(180))
-                    .lineToLinearHeading(new Pose2d(-35, -22, Math.toRadians(180)))
+            TrajectorySequence MidP = drive.trajectorySequenceBuilder(mid.end().plus(new Pose2d(0,0, Math.toRadians(180))))
+                    .turn(Math.toRadians(90))
+                    .lineToLinearHeading(new Pose2d(2, 35, Math.toRadians(90)))
                     .build();
 
-            TrajectorySequence LeftP = drive.trajectorySequenceBuilder(left.end())
-                    .lineToLinearHeading(new Pose2d(-40, -22, Math.toRadians(180)))
+            TrajectorySequence LeftP = drive.trajectorySequenceBuilder(left.end().plus(new Pose2d(0,0, Math.toRadians(-105))))
+                    .turn(Math.toRadians(15))
+                    .lineToLinearHeading(new Pose2d(-38, -5, Math.toRadians(-90)))
                     .build();
 
-            TrajectorySequence ER = drive.trajectorySequenceBuilder(RightP.end())
-                    .strafeTo(new Vector2d(-44,-10))
+            TrajectorySequence ER = drive.trajectorySequenceBuilder(RightP.end().plus(new Pose2d(0,0, Math.toRadians(0))))
+                    .lineToConstantHeading(new Vector2d(3, -15))
                     .build();
 
-            TrajectorySequence EL = drive.trajectorySequenceBuilder(LeftP.end())
-                    .lineToLinearHeading(new Pose2d(0,-30, Math.toRadians(180)))
+            TrajectorySequence EL = drive.trajectorySequenceBuilder(LeftP.end().plus(new Pose2d(0,0, Math.toRadians(0))))
+                    .lineToLinearHeading(new Pose2d(0,-30, Math.toRadians(0)))
                     .build();
 
-            TrajectorySequence EM = drive.trajectorySequenceBuilder(MidP.end())
-                    .lineToLinearHeading(new Pose2d(0,-30,Math.toRadians(180)))
+            TrajectorySequence EM = drive.trajectorySequenceBuilder(MidP.end().plus(new Pose2d(0,0, Math.toRadians(0))))
+                    .lineToLinearHeading(new Pose2d(0,-23,Math.toRadians(0)))
                     .build();
 
             ElapsedTime tempo = new ElapsedTime();
@@ -151,105 +151,105 @@ public class AutonomusTraining extends LinearOpMode {
         FtcDashboard.getInstance().startCameraStream(controlHubCam, 30);
         waitForStart();
         telemetry.addData("Local", drive.getLocalizer());
-                //RIGHT
-                if (cX > 570 && cY > 600){
-                    drive.followTrajectorySequence(right);
-                    tempo.startTime();
-                    tempo.reset();
-                    while (tempo.seconds() < 1){
-                        MART.setPower(0.1);
-                    }
-                    MART.setPower(0);
-                    sleep(1000);
-                    SGE.setPosition(1);
-                    sleep(1000);
-                    tempo.reset();
-                    while (tempo.seconds() < 1){
-                        MART.setPower(-0.3);
-                    }
-                    MART.setPower(0);
-                    tempo.reset();
-                    while (tempo.seconds()<2){
-                        MBD.setPower(0.35);
-                    }
-                    MBD.setPower(0);
-                    drive.followTrajectorySequence(RightP);
-                    while (tempo.seconds() <2){
-                        MART.setPower(0.2);
-                    }
-                    SGD.setPosition(1);
-                    MART.setPower(0);
-                    sleep(1000);
-                    tempo.reset();
-                    while (tempo.seconds()<2){
-                        MBD.setPower(-0.5);
-                    }
+
+
+        //RIGHT
+        if (cX > 570 && cY > 600){
+            drive.followTrajectorySequence(right);
+            tempo.startTime();
+            tempo.reset();
+            while (tempo.seconds() < 1){
+                MART.setPower(0.1);
+            }
+            MART.setPower(0);
+            sleep(1000);
+            SGE.setPosition(1);
+            sleep(1000);
+            tempo.reset();
+            while (tempo.seconds() < 1){
+                MART.setPower(-0.3);
+            }
+            MART.setPower(0);
+            tempo.reset();
+            while (tempo.seconds()<2){
+                MBD.setPower(0.35);
+            }
+            MBD.setPower(0);
+            drive.followTrajectorySequence(RightP);
+            while (tempo.seconds() <2){
+                MART.setPower(0.2);
+            }
+            SGD.setPosition(1);
+            MART.setPower(0);
+            sleep(1000);
+            tempo.reset();
+            while (tempo.seconds()<2){
+                MBD.setPower(-0.5);
+            }
                     drive.followTrajectorySequence(ER);
-                }
-
-                //MIDDLE
-                //127, 590
-                else if (cX < 500 && cX > 100){
-                    tempo.reset();
-                    drive.followTrajectorySequence(mid);
-                    sleep(2000);
-                    tempo.reset();
-                    while (tempo.seconds() < 1){
-                        MART.setPower(0.1);
-                    }
-                    MART.setPower(0);
-                    sleep(1000);
-                    SGE.setPosition(1);
-                    tempo.reset();
-                    while (tempo.seconds() < 1){
-                        MART.setPower(-0.1);
-                    }
-                    //tempo pro BD
-                    sleep(2000);
-                    tempo.reset();
-                    while (tempo.seconds() < 2){
-                        MBD.setPower(0.4);
-                    }
-                    MBD.setPower(0);
-                    drive.followTrajectorySequence(MidP);
-                    tempo.reset();
-                    while (tempo.seconds() < 1){
-                        MART.setPower(0.2);
-                    }
-                    SGD.setPosition(1);
-                    drive.followTrajectorySequence(EM);
-                }
-
-                //LEFT
-                else{
-                    drive.followTrajectorySequence(left);
-                    tempo.startTime();
-                    tempo.reset();
-                    while (tempo.seconds()<1){
-                        MART.setPower(0.1);
-                    }
-                    MART.setPower(0);
-                    SGE.setPosition(1);
-                    tempo.reset();
-                    while (tempo.seconds() < 1) {
-                        MART.setPower(-0.3);
-                    }
-                    while (tempo.seconds() < 2){
-                        MBD.setPower(0.4);
-                    }
-                    MBD.setPower(0);
-                    drive.followTrajectorySequence(LeftP);
-                    tempo.reset();
-                    while (tempo.seconds() < 1){
-                        MART.setPower(0.2);
-                    }
-                    SGD.setPosition(1);
-                    drive.followTrajectorySequence(EL);
-                }
-
-            requestOpModeStop();
-
         }
+        //MIDDLE
+        //127, 590
+        else if (cX < 500 && cX > 100){
+            tempo.reset();
+            drive.followTrajectorySequence(mid);
+            sleep(2000);
+            tempo.reset();
+            while (tempo.seconds() < 1){
+                MART.setPower(0.1);
+            }
+            MART.setPower(0);
+            sleep(1000);
+            SGE.setPosition(1);
+            tempo.reset();
+            while (tempo.seconds() < 1){
+                MART.setPower(-0.1);
+            }
+            //tempo pro BD
+            sleep(2000);
+            tempo.reset();
+            while (tempo.seconds() < 2){
+                MBD.setPower(0.4);
+            }
+            MBD.setPower(0);
+            drive.followTrajectorySequence(MidP);
+            tempo.reset();
+            while (tempo.seconds() < 1){
+                MART.setPower(0.2);
+            }
+            SGD.setPosition(1);
+            drive.followTrajectorySequence(EM);
+        }
+        //LEFT
+        else{
+            drive.followTrajectorySequence(left);
+            tempo.startTime();
+            tempo.reset();
+            while (tempo.seconds()<1){
+                MART.setPower(0.1);
+            }
+            MART.setPower(0);
+            SGE.setPosition(1);
+            tempo.reset();
+            while (tempo.seconds() < 1) {
+                MART.setPower(-0.3);
+            }
+            while (tempo.seconds() < 2){
+                MBD.setPower(0.4);
+            }
+            MBD.setPower(0);
+            drive.followTrajectorySequence(LeftP);
+            tempo.reset();
+            while (tempo.seconds() < 1){
+                MART.setPower(0.2);
+            }
+            SGD.setPosition(1);
+            drive.followTrajectorySequence(EL);
+        }
+        
+        requestOpModeStop();
+
+    }
 
     private void initOpenCV() {
 
